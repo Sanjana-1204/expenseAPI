@@ -4,9 +4,24 @@ const { requireAuth } = require('../middleware/authMiddleware');
 const router = Router();
 
 
+// Expense Routes - for user to deal with expenses
+
+// Post request - to add an expense
+router.post('/expenses', requireAuth, expenseController.createExpense);
+
+// Get request - to get all expenses
+router.get('/expenses', requireAuth, expenseController.getAllExpenses);
+
+// Get request - to get an expense by an {id}
+router.get('/expenses/:id', requireAuth, expenseController.getExpenseById);
+
+// Put request - to update an expense with the help of an id
+router.put('/expenses/:id', requireAuth, expenseController.updateExpense);
+
+// Delete request - to delete an expense by its id
+router.delete('/expenses/:id', requireAuth, expenseController.deleteExpense);
 
 
-router.get('/all-expenses', expenseController.expense_index);
-router.post('/expenses', requireAuth, expenseController.expense_create_post);
+
 
 module.exports = router;

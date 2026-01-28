@@ -7,7 +7,7 @@
 // to update an expense object
 const Expense = require('../models/ExpenseModel');
 
-const expense_index = (req, res) => {
+const getAllExpenses = (req, res) => {
     Expense.find()
         .then((result) => {
             res.send(result);
@@ -18,7 +18,7 @@ const expense_index = (req, res) => {
 }
 
 // to create an expense 
-const expense_create_post = (req, res) => {
+const createExpense = (req, res) => {
     const expense = new Expense({
         ...req.body,          // Fix 1: Spread operator is 3 dots (...)
         userId: req.user._id  // Fix 2: Put userId INSIDE the object
@@ -34,8 +34,22 @@ const expense_create_post = (req, res) => {
             res.status(400).json({ error: err.message });
         });
 }
+const getExpenseById = (req, res) => {
 
+}
+
+const updateExpense = (req, res) => {
+
+}
+
+
+const deleteExpense = (req, res) => {
+
+}
 module.exports = {
-    expense_create_post,
-    expense_index
+    createExpense,
+    getAllExpenses,
+    getExpenseById,
+    updateExpense,
+    deleteExpense
 }

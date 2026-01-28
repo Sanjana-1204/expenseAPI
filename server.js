@@ -4,8 +4,9 @@ const connectDB = require('./config/db');
 const expenseRoutes = require('./routes/expenseRoutes.js')
 const authRoutes = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
-const { requireAuth } = require('./middleware/authMiddleware.js');
-const authController = require('./controller/authController');
+// const { requireAuth } = require('./middleware/authMiddleware.js');
+// const authController = require('./controller/authController');
+const budgetRoutes = require('./routes/budgetRoutes')
 
 dotenv.config();
 
@@ -32,7 +33,8 @@ connectDB().then(() => {
 app.use(authRoutes);
 // app.get('/expenses', requireAuth, authController.expenses)
 // app.use('/expense', expenseRoutes);
-app.use(expenseRoutes)
+app.use(expenseRoutes);
+app.use(budgetRoutes);
 
 // app.use((req, res) => {
 //     res.status(404).sendFile('./vi')

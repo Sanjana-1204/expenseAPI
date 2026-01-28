@@ -45,7 +45,7 @@ const createToken = (id) => {
 };
 // controller logic for signing in
 
-const signup_post = async (req, res) => {
+const userSignup = async (req, res) => {
     try {
         const { email, password } = req.body;
         console.log("Value of User is:", User);
@@ -64,7 +64,7 @@ const signup_post = async (req, res) => {
     }
 }
 
-const login_post = async (req, res) => {
+const userLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.login(email, password);
@@ -79,9 +79,9 @@ const login_post = async (req, res) => {
 
 }
 
-const logout_get = (req, res) => {
+const userLogout = (req, res) => {
     res.cookie('jwt', '', { maxAge: 1 });
-    res.redirect('/login');
+    res.redirect('/auth/login');
 }
 
 const expenses = (req, res) => {
@@ -89,13 +89,9 @@ const expenses = (req, res) => {
 }
 
 
-const login_get = (req, res) => {
-    res.send('this is the login page');
-}
+
 module.exports = {
-    signup_post,
-    login_post,
-    login_get,
-    expenses,
-    logout_get
+    userSignup,
+    userLogin,
+    userLogout
 }
