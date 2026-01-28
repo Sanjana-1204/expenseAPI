@@ -10,6 +10,8 @@ router.post('/budgets', requireAuth, budgetController.createBudget);
 router.get('/budgets', requireAuth, budgetController.getAllBudgets);
 
 // Get request - to get the summary for a user
+// budgets/summary should be written strictly above budgets/:id , otherwise , the "/summary"
+// will be considered as ":id"
 router.get('/budgets/summary', requireAuth, budgetController.getBudgetSummary);
 
 // Get request - to get a budget by its id
