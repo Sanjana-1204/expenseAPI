@@ -13,12 +13,19 @@ const createBudget = async (req, res, next) => {
 }
 
 const getAllBudgets = async (req, res, next) => {
+
     try {
-        const budgets = await budgetService.getAllBudgets({ userId: req.user._id })
+        // get the filters and the id from the req.body
+        const budgets = await budgetService.getAllBudgets({
+            userId: req.user._id,
+            filters: req.query
+        })
         res.status(200).json(budgets);
     } catch (err) {
         next(err);
     }
+
+
 }
 
 const getBudgetById = async (req, res, next) => {
@@ -32,7 +39,7 @@ const getBudgetById = async (req, res, next) => {
 
 const updateBudget = async (req, res, next) => {
     try {
-        const budget = await budgetService.updateBudget({ id: req.params.id, ...req.body, userId: req.user._id });
+        const budget = await budgetService.updateBudget({ id: req.params.id, userId: req.user._id, updateData: req.body });
         res.status(200).json(budget)
     } catch (err) {
         next(err)
