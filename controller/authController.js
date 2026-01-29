@@ -80,15 +80,10 @@ const userLogin = async (req, res) => {
 }
 
 const userLogout = (req, res) => {
-    // 1. Clear the cookie
-    // IMPORTANT: You must pass the SAME options used when you created the cookie
-    // (except maxAge/expires). If you don't, it won't be deleted.
     res.cookie('jwt', '', {
         httpOnly: true,
         maxAge: 1
     });
-
-    // 2. Send JSON, not a Redirect
     res.status(200).json({ message: "Logged out successfully" });
 }
 
