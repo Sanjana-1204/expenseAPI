@@ -1,50 +1,69 @@
-// const Expense = require('../models/expense');
-// const jwt = require('jsonwebtoken')
-// expense_index - find all expenses
-// expense_details - find expense by id
-// to create a expense -add it
-// to delete an expense by its id
-// to update an expense object
-const Expense = require('../models/ExpenseModel');
+const expenseService = require('../services/expenseService');
 
-const getAllExpenses = (req, res) => {
-    Expense.find()
-        .then((result) => {
-            res.send(result);
-        })
-        .catch((err) => {
-            console.log(err);
-        })
+const getAllExpenses = async (req, res, next) => {
+
+    try {
+        const expenses = await expenseService.getAllExpenses({
+            userId: req.user._id,
+            filters: req.query
+        });
+        res.status(200).json(expenses);
+    } catch (err) {
+        next(err)
+    }
 }
 
 // to create an expense 
-const createExpense = (req, res) => {
-    const expense = new Expense({
-        ...req.body,          // Fix 1: Spread operator is 3 dots (...)
-        userId: req.user._id  // Fix 2: Put userId INSIDE the object
-    });
-    console.log("Logged in User:", req.user);
-
-    expense.save()
-        .then((result) => {
-            res.status(201).json(result);
-        })
-        .catch((err) => {
-            // detailed error for debugging
-            res.status(400).json({ error: err.message });
+const createExpense = async (req, res, next) => {
+    try {
+        const expense = await expenseService.createExpense({
+            userId: req.user._id,
+            ...req.body
         });
+        res.status(201).json(expense);
+
+    } catch (err) {
+        next(err);
+    }
 }
-const getExpenseById = (req, res) => {
+const getExpenseById = async (req, res, next) => {
+
+    try {
+        const expenseById = await expenseService.getExpenseById({
+            id: req.params.id,
+            userId: req.user._id
+        });
+        res.status(200).json(expenseById);
+    } catch (err) {
+        next(err);
+    }
 
 }
 
-const updateExpense = (req, res) => {
-
+const updateExpense = async (req, res, next) => {
+    try {
+        const expense = await expenseService.updateExpense({
+            id: req.params.id,
+            userId: req.user._id,
+            updateData: req.body
+        });
+        res.status(200).json(expense);
+    } catch (err) {
+        next(err);
+    }
 }
 
 
-const deleteExpense = (req, res) => {
-
+const deleteExpense = async (req, res, next) => {
+    try {
+        const expense = await expenseService.deleteExpense({
+            id: req.params.id,
+            userId: req.user._id
+        });
+        res.status(200).json(expense);
+    } catch (err) {
+        next(err);
+    }
 }
 module.exports = {
     createExpense,

@@ -1,4 +1,3 @@
-const { _bigint } = require('zod/v4/core');
 const budgetDao = require('../dao/budgetDao');
 
 const createBudget = async ({ category, limit, userId }) => {
@@ -12,14 +11,6 @@ const createBudget = async ({ category, limit, userId }) => {
     } else {
         throw new Error("Budget already exists");
     }
-
-
-    // const budget = await budgetDao.createBudget({ user: userId, category: body.category, month: body.month, limit: body.limit });
-    // if (!budget) {
-    //     throw new Error("Budget not created")
-    // }
-    // return budget;
-
 }
 
 const getAllBudgets = async ({ userId, filters }) => {
@@ -42,24 +33,13 @@ const getBudgetById = async ({ id, userId }) => {
     return budget;
 }
 
-const getBudgetSummary = async () => {
 
+const getBudgetSummary = async ({ userId, startDate, endDate }) => {
+    const summary = await budgetDao.summarizeBudget({ userId, startDate, endDate });
+    return summary;
 }
 
 const updateBudget = async ({ id, userId, updateData }) => {
-    // try {
-    //     // 1. Just try to update immediately. 
-    //     // If it works, great! If it's a duplicate, it will fail here.
-    //     const updatedBudget = await budgetDao.updateBudget(
-    //         { _id: id, userId },
-    //         updateData
-    //     );
-
-    //     if (!updatedBudget) {
-    //         throw new Error("Budget not found");
-    //     }
-
-    //     return updatedBudget;
     try {
         const updatedBudget = await budgetDao.updateBudget({
             _id: id, userId: userId
@@ -83,6 +63,7 @@ const deleteBudget = async ({ id, userId }) => {
 
     return budget;
 }
+
 
 
 module.exports = {

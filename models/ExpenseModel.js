@@ -7,7 +7,6 @@ const expenseSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        index: true
     },
     amount: {
         type: Number,
@@ -17,9 +16,10 @@ const expenseSchema = new Schema({
     category: {
         type: String,
         required: true,
-        enum: ['Groceries', 'Utilities', 'Entertainment', 'Leisure', 'Health', 'Miscellenous'],
         index: true,
-        trim: true
+        trim: true,
+        enum: ['Groceries', 'Rent', 'Transportation', 'Activities', 'Shopping', 'Subscriptions', 'Essentials', 'Leisure', 'Health']
+
     },
     date: {
         type: Date,
@@ -32,6 +32,7 @@ const expenseSchema = new Schema({
 }, { timestamps: true }
 );
 
+expenseSchema.index({ userId: 1, date: -1 });
 
 const Expense = mongoose.model('Expense', expenseSchema);
 module.exports = Expense;

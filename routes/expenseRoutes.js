@@ -2,12 +2,14 @@ const { Router } = require('express');
 const expenseController = require('../controller/expenseController');
 const { requireAuth } = require('../middleware/authMiddleware');
 const router = Router();
+const validate = require('../middleware/validate');
+const expenseValidator = require('../validator/expenseValidator');
 
 
 // Expense Routes - for user to deal with expenses
 
 // Post request - to add an expense
-router.post('/expenses', requireAuth, expenseController.createExpense);
+router.post('/expenses', requireAuth, validate(expenseValidator.expenseSchema), expenseController.createExpense);
 
 // Get request - to get all expenses
 router.get('/expenses', requireAuth, expenseController.getAllExpenses);
@@ -16,7 +18,7 @@ router.get('/expenses', requireAuth, expenseController.getAllExpenses);
 router.get('/expenses/:id', requireAuth, expenseController.getExpenseById);
 
 // Put request - to update an expense with the help of an id
-router.put('/expenses/:id', requireAuth, expenseController.updateExpense);
+router.put('/expenses/:id', requireAuth, validate(expenseValidator.expenseSchema), expenseController.updateExpense);
 
 // Delete request - to delete an expense by its id
 router.delete('/expenses/:id', requireAuth, expenseController.deleteExpense);

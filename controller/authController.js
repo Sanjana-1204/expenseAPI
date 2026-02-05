@@ -1,36 +1,36 @@
 const User = require('../models/UserModel');
 const jwt = require('jsonwebtoken');
-// handle errors
-const handleErrors = (err) => {
-    console.log(err.message, err.code);
-    // create an errors object
-    let errors = { email: "", password: "" };
 
-    // incorrect email
-    if (err.message === 'incorrect email!') {
-        errors.email = 'that email is not registered, please try again'
-    }
+// const handleErrors = (err) => {
+//     console.log(err.message, err.code);
+//     // create an errors object
+//     let errors = { email: "", password: "" };
 
-    // incorrect password
-    if (err.message === 'incorrect password') {
-        errors.password = 'that password is incorrect, please try again'
-    }
+//     // incorrect email
+//     if (err.message === 'incorrect email!') {
+//         errors.email = 'that email is not registered, please try again'
+//     }
 
-    // duplicate error code
-    if (err.code == 11000) {
-        errors.email = "Email is already registered";
-        return errors;
-    }
-    // validation errors
-    if (err.message.includes('user validation failed')) {
-        Object.values(err.errors).forEach(({ properties }) => {
-            errors[properties.path] = properties.message;
+//     // incorrect password
+//     if (err.message === 'incorrect password') {
+//         errors.password = 'that password is incorrect, please try again'
+//     }
 
-        });
-    }
+//     // duplicate error code
+//     if (err.code == 11000) {
+//         errors.email = "Email is already registered";
+//         return errors;
+//     }
+//     // validation errors
+//     if (err.message.includes('user validation failed')) {
+//         Object.values(err.errors).forEach(({ properties }) => {
+//             errors[properties.path] = properties.message;
 
-    return errors;
-}
+//         });
+//     }
+
+//     return errors;
+// }
 
 // maxAge for a cookie to be held up by the browser 
 const maxAge = 2 * 24 * 60 * 60; // 2 days-> in seconds
@@ -45,7 +45,7 @@ const createToken = (id) => {
 };
 // controller logic for signing in
 
-const userSignup = async (req, res) => {
+const userSignup = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         console.log("Value of User is:", User);
@@ -59,12 +59,11 @@ const userSignup = async (req, res) => {
         res.status(200).json({ user: user._id });
     }
     catch (err) {
-        const errors = handleErrors(err);
-        res.status(400).json({ errors });
+        next(err);
     }
 }
 
-const userLogin = async (req, res) => {
+const userLogin = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const user = await User.login(email, password);
@@ -73,13 +72,12 @@ const userLogin = async (req, res) => {
         res.status(200).json({ user: user._id });
     }
     catch (err) {
-        const errors = handleErrors(err);
-        res.status(400).json({ errors });
+        next(err);
     }
 
 }
 
-const userLogout = (req, res) => {
+const userLogout = (req, res,) => {
     res.cookie('jwt', '', {
         httpOnly: true,
         maxAge: 1

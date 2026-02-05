@@ -1,4 +1,4 @@
-// const Budget = require('../models/BudgetModel');
+const { AppError } = require('../middleware/errorHandler');
 const budgetService = require('../services/budgetService');
 
 const createBudget = async (req, res, next) => {
@@ -7,7 +7,8 @@ const createBudget = async (req, res, next) => {
         // json status code for successful object creation is :201
         res.status(201).json(budget);
     } catch (err) {
-        next(err);
+        const error = new AppError(err.message, 404);
+        next(error);
 
     }
 }
@@ -58,12 +59,22 @@ const deleteBudget = async (req, res, next) => {
 
 const getBudgetSummary = async (req, res, next) => {
     try {
-        const summary = await budgetService.getBudgetSummary({ userId: req.user._id });
-        res.status(200).json(summary);
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        endOfMonth.setHours(23, 59, 59, 999);
+
+        const summary = await budgetService.getBudgetSummary({ userId: req.user._id, startDate: startOfMonth, endDate: endOfMonth });
+
+
+        res.status(200).json({
+            "Budget Summary: ": summary
+        });
     } catch (err) {
-        next(err)
+        next(err);
     }
 }
+
 
 module.exports = {
     createBudget,

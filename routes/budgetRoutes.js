@@ -2,9 +2,11 @@ const { Router } = require('express');
 const router = Router();
 const { requireAuth } = require('../middleware/authMiddleware');
 const budgetController = require('../controller/budgetController');
+const budgetValidator = require('../validator/budgetValidator');
+const validate = require('../middleware/validate');
 
 // Post request -  to add a budget
-router.post('/budgets', requireAuth, budgetController.createBudget);
+router.post('/budgets', requireAuth, validate(budgetValidator.budgetSchema), budgetController.createBudget);
 
 // Get request  - to get all the budgets
 router.get('/budgets', requireAuth, budgetController.getAllBudgets);
@@ -18,7 +20,7 @@ router.get('/budgets/summary', requireAuth, budgetController.getBudgetSummary);
 router.get('/budgets/:id', requireAuth, budgetController.getBudgetById);
 
 // Put request - to update a budget by id
-router.put('/budgets/:id', requireAuth, budgetController.updateBudget);
+router.put('/budgets/:id', requireAuth, validate(budgetValidator.budgetSchema), budgetController.updateBudget);
 
 // Delete request - to delete a budget by id
 router.delete('/budgets/:id', requireAuth, budgetController.deleteBudget);

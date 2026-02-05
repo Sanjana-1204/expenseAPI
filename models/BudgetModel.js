@@ -13,8 +13,8 @@ const budgetSchema = new Schema({
     category: {
         type: String,
         required: true,
-        enum: ['Groceries', 'Utilities', 'Entertainment', 'Leisure', 'Health', 'Miscellenous'],
-        trim: true
+        trim: true,
+        enum: ['Groceries', 'Rent', 'Transportation', 'Activities', 'Shopping', 'Subscriptions', 'Essentials', 'Leisure', 'Health']
     },
     limit: {
         type: Number,
