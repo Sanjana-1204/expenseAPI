@@ -11,26 +11,26 @@ const createToken = (id) => {
     });
 };
 
-const userSignup = asyncHandler(async (req, result) => {
+const userSignup = asyncHandler(async (req, res, next) => {
 
     const { email, password } = req.body;
     const user = await User.create({ email, password });
     const token = createToken(user._id);
     res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(201).json({ user: user._id });
-
+    next();
 
 
 })
 
-const userLogin = asyncHandler(async (req, res) => {
+const userLogin = asyncHandler(async (req, res, next) => {
 
     const { email, password } = req.body;
     const user = await User.login(email, password);
     const token = createToken(user._id);
     res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(200).json({ user: user._id });
-
+    next();
 });
 
 const userLogout = (req, res,) => {
