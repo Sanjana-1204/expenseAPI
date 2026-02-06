@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
-const z = require('zod');
+const { AppError } = require('../middleware/errorHandler');
 
 
 const userSchema = new mongoose.Schema(
@@ -22,25 +22,29 @@ const userSchema = new mongoose.Schema(
         }
     }, { timestamps: true });
 
+userSchema.pre('save', async function (next) {
 
+    if (!this.isModified('password')) {
+        return next();
+    }
 
-// hash the password before it is saved to the database
-userSchema.pre('save', async function () {
     const salt = await bcrypt.genSalt();
     this.password = await bcrypt.hash(this.password, salt);
+    next();
 });
 
 
 userSchema.statics.login = async function (email, password) {
     const user = await this.findOne({ email: email });
+    const authError = "Invalid email or password";
     if (user) {
         const auth = await bcrypt.compare(password, user.password);
         if (auth) {
             return user;
         }
-        throw Error('Incorrect password or email!');
+        throw Error(authError, 401);
     }
-    throw Error('Incorrect password or email!');
+    throw Error(authError, 401);
 };
 const User = mongoose.model('User', userSchema);
 module.exports = User;

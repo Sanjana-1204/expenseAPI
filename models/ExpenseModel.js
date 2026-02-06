@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
+const { maxLength } = require('zod');
 const Schema = mongoose.Schema;
-const z = require('zod');
 
 const expenseSchema = new Schema({
     userId: {
@@ -18,8 +18,10 @@ const expenseSchema = new Schema({
         required: true,
         index: true,
         trim: true,
-        enum: ['Groceries', 'Rent', 'Transportation', 'Activities', 'Shopping', 'Subscriptions', 'Essentials', 'Leisure', 'Health']
-
+        enum: {
+            values: ['Groceries', 'Rent', 'Transportation', 'Activities', 'Shopping', 'Subscriptions', 'Essentials', 'Leisure', 'Health'],
+            message: '{VALUE} is not a supported category'
+        }
     },
     date: {
         type: Date,
@@ -27,7 +29,8 @@ const expenseSchema = new Schema({
     },
     description: {
         type: String,
-        trim: true
+        trim: true,
+        maxLength: 150
     }
 }, { timestamps: true }
 );

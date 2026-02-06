@@ -1,81 +1,36 @@
 const User = require('../models/UserModel');
 const jwt = require('jsonwebtoken');
-
-// const handleErrors = (err) => {
-//     console.log(err.message, err.code);
-//     // create an errors object
-//     let errors = { email: "", password: "" };
-
-//     // incorrect email
-//     if (err.message === 'incorrect email!') {
-//         errors.email = 'that email is not registered, please try again'
-//     }
-
-//     // incorrect password
-//     if (err.message === 'incorrect password') {
-//         errors.password = 'that password is incorrect, please try again'
-//     }
-
-//     // duplicate error code
-//     if (err.code == 11000) {
-//         errors.email = "Email is already registered";
-//         return errors;
-//     }
-//     // validation errors
-//     if (err.message.includes('user validation failed')) {
-//         Object.values(err.errors).forEach(({ properties }) => {
-//             errors[properties.path] = properties.message;
-
-//         });
-//     }
-
-//     return errors;
-// }
-
-// maxAge for a cookie to be held up by the browser 
-const maxAge = 2 * 24 * 60 * 60; // 2 days-> in seconds
+const asyncHandler = require('express-async-handler');
 
 
-// createToken function to create a token for a user everytime 
-// a new user signs up
+const maxAge = 2 * 24 * 60 * 60;
+
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SEC, {
         expiresIn: maxAge
     });
 };
-// controller logic for signing in
 
-const userSignup = async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
-        console.log("Value of User is:", User);
-        // 1. Create the user
-        const user = await User.create({ email, password });
+const userSignup = asyncHandler(async (req, res, next) => {
 
-        // 2. Create token using the lowercase 'user' ID
-        const token = createToken(user._id);
+    const { email, password } = req.body;
+    const user = await User.create({ email, password });
+    const token = createToken(user._id);
+    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
+    res.status(201).json({ user: user._id });
 
-        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
-        res.status(200).json({ user: user._id });
-    }
-    catch (err) {
-        next(err);
-    }
-}
 
-const userLogin = async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.login(email, password);
-        const token = createToken(user._id);
-        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
-        res.status(200).json({ user: user._id });
-    }
-    catch (err) {
-        next(err);
-    }
 
-}
+})
+
+const userLogin = asyncHandler(async (req, res, next) => {
+
+    const { email, password } = req.body;
+    const user = await User.login(email, password);
+    const token = createToken(user._id);
+    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
+    res.status(200).json({ user: user._id });
+});
 
 const userLogout = (req, res,) => {
     res.cookie('jwt', '', {
@@ -85,9 +40,6 @@ const userLogout = (req, res,) => {
     res.status(200).json({ message: "Logged out successfully" });
 }
 
-const expenses = (req, res) => {
-    res.send('Hi this is just to check authentication');
-}
 
 
 

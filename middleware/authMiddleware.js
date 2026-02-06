@@ -1,34 +1,30 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
+const asyncHandler = require('express-async-handler');
+const { AppError } = require('./errorHandler');
 
-const requireAuth = (req, res, next) => {
-    // Step 1: Check for the Authorization Header (Standard for APIs)
+const requireAuth = asyncHandler(async (req, res, next) => {
     const { authorization } = req.headers;
-
     if (!authorization) {
-        return res.status(401).json({ error: 'Authorization token required' });
+        throw new AppError('Authorization token required!', 401);
     }
-
-    // Step 2: Extract the token (Format is usually "Bearer <token>")
     const token = authorization.split(' ')[1];
-
+    if (!token) {
+        throw new AppError('Invalid token. Please log in again!', 401)
+    }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SEC);
 
-        // Check what the token actually holds
         console.log("Decoded Token:", decoded);
-
-        // Extract the ID safely (checking for 'id' OR '_id')
         const userId = decoded.id || decoded._id;
-
         req.user = { _id: userId };
-        next();
 
+        next();
     } catch (error) {
-        console.log(error);
-        res.status(401).json({ error: 'Request is not authorized' });
+        throw new AppError('Invalid or expired token. Please log in again.', 401);
     }
-};
+});
+
 
 module.exports = {
     requireAuth

@@ -1,22 +1,19 @@
 const budgetDao = require('../dao/budgetDao');
 
 const createBudget = async ({ category, limit, userId }) => {
-    const existingBudget = await budgetDao.findBudget({ userId: userId, category: category });
-    if (existingBudget === null) {
-        const budget = await budgetDao.createBudget({ userId: userId, category: category, limit: limit });
-        if (!budget) {
-            throw new Error("Budget not created")
-        }
-        return budget;
-    } else {
-        throw new Error("Budget already exists");
+    const existingBudget = await budgetDao.findBudget({ userId, category });
+    if (existingBudget) {
+        throw new AppError("Budget for this category already exists", 409); // 409 Conflict
     }
-}
+    const budget = await budgetDao.createBudget({ userId, category, limit });
+    if (!budget) {
+        throw new AppError("Budget could not be created", 500);
+    }
+    return budget;
+};
 
 const getAllBudgets = async ({ userId, filters }) => {
-    // 1. Base result (Always filter by User)
     const result = { userId: userId };
-    // take the filters out and assign the category value to the result
     if (filters.category) {
         result.category = filters.category;
     }
@@ -28,7 +25,7 @@ const getBudgetById = async ({ id, userId }) => {
         userId: userId
     });
     if (!budget) {
-        throw new Error("Budget does not exist!")
+        throw new AppError("Budget does not exist!", 404)
     }
     return budget;
 }
@@ -44,13 +41,13 @@ const updateBudget = async ({ id, userId, updateData }) => {
         const updatedBudget = await budgetDao.updateBudget({
             _id: id, userId: userId
         }, updateData);
-        if (!updateBudget) {
-            throw new Error("Budget not found")
+        if (!updatedBudget) {
+            throw new AppError("Budget not found", 404)
         }
         return updatedBudget;
     } catch (err) {
         if (err.code == 11000) {
-            throw new Error(`Budget with ${updateData.category} already exists`);
+            throw new Error(`Budget with ${updateData.category} already exists`, 409);
         }
         throw err;
     }
@@ -59,8 +56,10 @@ const deleteBudget = async ({ id, userId }) => {
     const budget = await budgetDao.deleteBudget({
         _id: id,
         userId: userId
-    });
-
+    })
+    if (!budget) {
+        throw new AppError('Budget not found or already deleted', 404);
+    }
     return budget;
 }
 

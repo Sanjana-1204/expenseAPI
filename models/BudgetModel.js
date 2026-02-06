@@ -1,8 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const z = require('zod')
-
-// defining 
 
 const budgetSchema = new Schema({
     userId: {
@@ -14,17 +11,19 @@ const budgetSchema = new Schema({
         type: String,
         required: true,
         trim: true,
-        enum: ['Groceries', 'Rent', 'Transportation', 'Activities', 'Shopping', 'Subscriptions', 'Essentials', 'Leisure', 'Health']
+        enum: {
+            values: ['Groceries', 'Rent', 'Transportation', 'Activities', 'Shopping', 'Subscriptions', 'Essentials', 'Leisure', 'Health'],
+            message: '{VALUE} is not a supported category'
+        }
     },
     limit: {
         type: Number,
         required: true,
-        min: 1
+        min: [1, "Budget limit must be at least 1"]
 
     }
 }, { timestamps: true });
 
-// Compound Index for user and category
 budgetSchema.index({ userId: 1, category: 1 }, { unique: true });
 
 const Budget = mongoose.model('Budget', budgetSchema);

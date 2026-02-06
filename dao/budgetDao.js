@@ -60,28 +60,27 @@ const summarizeBudget = async ({ userId, startDate, endDate }) => {
             }
         }, {
             $unwind: {
-                path: "$budgetDetails", // Target the array from the lookup
-                preserveNullAndEmptyArrays: true // Keep expenses even if no budget exists
+                path: "$budgetDetails",
+                preserveNullAndEmptyArrays: true
             }
         },
         {
             $project: {
-                _id: 0, // Hide the ID
-                category: "$_id", // Rename _id to category for frontend
+                _id: 0,
+                category: "$_id",
                 summary: {
                     $cond: {
-                        if: { $not: ["$budgetDetails"] }, // CHECK: Did we find a budget?
-                        then: "Alert: No budget set for this category!", // IF NO
-                        else: { // IF YES
+                        if: { $not: ["$budgetDetails"] },
+                        then: "Alert: No budget set for this category!",
+                        else: {
                             $concat: [
-                                // 1. The Percentage
+
                                 { $toString: { $round: [{ $multiply: [{ $divide: ["$totalSpent", "$budgetDetails.limit"] }, 100] }, 0] } },
                                 "%",
-                                // 2. The Text
                                 " (Rs. ",
                                 { $toString: "$totalSpent" },
                                 " spent out of Rs. ",
-                                { $toString: "$budgetDetails.limit" }, // Ensure your Budget model uses 'amount' or 'limit' here
+                                { $toString: "$budgetDetails.limit" },
                                 ")"
                             ]
                         }
