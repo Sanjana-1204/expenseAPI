@@ -18,8 +18,8 @@ const requireAuth = asyncHandler(async (req, res, next) => {
         console.log("Decoded Token:", decoded);
         const userId = decoded.id || decoded._id;
         req.user = { _id: userId };
-
         next();
+
     } catch (error) {
         throw new AppError('Invalid or expired token. Please log in again.', 401);
     }

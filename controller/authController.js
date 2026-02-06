@@ -1,5 +1,6 @@
 const User = require('../models/UserModel');
 const jwt = require('jsonwebtoken');
+// ✅ FIXED: Using the library you just installed
 const asyncHandler = require('express-async-handler');
 
 const maxAge = 2 * 24 * 60 * 60;
@@ -10,50 +11,32 @@ const createToken = (id) => {
     });
 };
 
+
 const userSignup = asyncHandler(async (req, res) => {
+
     const { email, password } = req.body;
-
-
     const user = await User.create({ email, password });
-
     const token = createToken(user._id);
 
     res.cookie('jwt', token, {
         httpOnly: true,
-        maxAge: maxAge * 1000,
-
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
+        maxAge: maxAge * 1000
     });
-
     res.status(201).json({ user: user._id });
-
 });
 
 const userLogin = asyncHandler(async (req, res) => {
+
     const { email, password } = req.body;
-
-
     const user = await User.login(email, password);
-
     const token = createToken(user._id);
 
-    res.cookie('jwt', token, {
-        httpOnly: true,
-        maxAge: maxAge * 1000,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
-    });
-
+    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(200).json({ user: user._id });
-
 });
 
 const userLogout = (req, res) => {
-    res.cookie('jwt', '', {
-        httpOnly: true,
-        maxAge: 1
-    });
+    res.cookie('jwt', '', { maxAge: 1 });
     res.status(200).json({ message: "Logged out successfully" });
 }
 

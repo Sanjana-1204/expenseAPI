@@ -19,7 +19,8 @@ const globalErrorHandler = (error, req, res, next) => {
     error.status = error.status || "error";
     res.status(error.statusCode).json({
         status: error.status,
-        message: error.message
+        message: error.message,
+        captureStackTrace: true
     });
 }
 
